@@ -2,11 +2,11 @@ LoveMatches = new Meteor.Collection('lovematches');
 
 LoveMatches.allow({
 	insert: function(userID, lovematch){
-		return userID && (lovematch.first == userID || lovematch.second == userID);
+		return !!userID;
 	},
 
-	update: function(){
-		return false;
+	update: function(userID, lovematch){
+		return lovematch.second == userID;
 	},
 
 	remove: function(userID, lovematch){
