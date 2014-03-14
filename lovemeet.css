@@ -1,6 +1,8 @@
 /* CSS declarations go here */
+@import url(http://fonts.googleapis.com/css?family=Lato:300,400,700);
 
 .header {
+	font-family: 'Lato' !important;
 	text-align: center;
 	background-color: #4bf !important;	
 }
@@ -21,6 +23,24 @@
 	padding-top: 10px;
 }
 
-.or, .login-password-form {
-	display: none;
+.friends-nav {
+	padding-top: 15px;
+}
+
+.front {
+	background-color: #d9534f !important;
+	height: 100%;
+	width: 100%;
+	position: fixed;
+	display: table;
+}
+
+.front div {
+	display: table-cell;
+    vertical-align:middle;
+    text-align: center;
+}
+
+.front small {
+	color: #c0362c !important;
 }

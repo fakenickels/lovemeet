@@ -1,0 +1,103 @@
+<head>
+  <title>lovemeet</title>
+  <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+</head>
+
+<body>	
+	{{> header}}
+
+	{{#if currentUser}}
+		<div class='container'>
+			<ul class='nav nav-tabs'>
+				<li class='active'>
+					<a href="#love_select" data-toggle='tab'>Escolher pessoas</a>
+				</li>
+				<li>
+					<a href="#matches">Ver matches {{ matchesCount }}</a>
+				</li>
+			</ul>
+			<div>
+				<div class="tab-pane active" id="love_select">
+					{{> love_select}}
+				</div>
+				<div class='tb-pane' id='matches'>
+					{{> lovematches}}
+				</div>
+			</div>
+		</div>
+	{{/if}}
+
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>	
+</body>
+
+<template name='header'>
+
+	{{#if currentUser}}
+	<div class='header jumbotron'>
+		<h1>LoveMeet <small>Encontre seu par</small></h1>
+		{{loginButtons}}
+	</div>
+	{{else}}
+	<div class='header jumbotron front'>
+		<div>
+		<h1>LoveMeet <small>Encontre seu par</small></h1>
+		<p>Selecione quem você está afim no Facebook e se a pessoa também estiver afim, o LoveMeet avisa!</p>
+		<p><button type='button' id='fbLogin' class='btn btn-danger btn-lg'>Entre com o Facebook</button></p>
+		</div>
+	</div>
+	{{/if}}
+
+</template>
+
+<template name='love_select'>
+	<h1>De quem você é afim?</h1>
+	<form>
+		<input class='form-control' placeholder='Digite e aperte ENTER para buscar...' id='love-search'>
+	</form>
+	
+	<div class='row'>
+		<div class='friends'>
+		{{#each friends}}
+		  <div class="col-sm-6 col-md-4">
+		    <div class="thumbnail">
+		      <img src="{{getUserPhoto id}}" height='200' width= '200' class='img-responsive'>
+		      <div class="caption">
+		        <h3><a href="{{fbLink id}}" target="_blank">{{ shrinkName name }}</a></h3>
+		        <p>
+		        	<button type='button' class="btn btn-danger i-love">Estou afim</button> 
+		        </p>
+		      </div>
+		    </div>
+		  </div>
+		{{/each}}	
+		</div>
+	</div>
+
+	<div class='friends-nav row'>
+  		<div class='col-sm-6 col-md-6' style='text-align: center'>
+  			<button type='button' class='btn btn-primary btn-block' id='friends-nav-left'>&larr;</button>
+  		</div>
+  		<div class='col-sm-6 col-md-6' style='text-align: center'>
+  			<button type='button' class='btn btn-primary btn-block' id='friends-nav-right'>&rarr;</button>
+  		</div>
+	</div>
+</template>
+
+<template name='lovematches'>
+	{{#each user_matches}}
+		<div class='row'>
+ 
+  <div class="col-sm-6 col-md-4">
+    <div class="thumbnail">
+      <img src="{{ getUserPhoto second }}" height='200' width= '200' clas='img-responsive'>
+      <div class="caption">
+        <h3>...</h3>
+        <p>...</p>
+        <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+      </div>
+    </div>
+  </div>
+
+		</div>
+	{{/each}}
+</template>
