@@ -9,9 +9,17 @@ if( Meteor.isClient ){
 		
 	});
 	
-	Handlebars.registerHelper('checkMatchByFb', function(id){
+	Handlebars.registerHelper('checkLoveMatch', function(id){
+		var match = LoveMatches.find({ $or: [{first: id}, {matched: true}]});
 
+		return match.fetch();
 	});
+
+	Handlebars.registerHelper('userHasLoved', function(id){
+		var match = LoveMatches.find({first: Session.get('userFbId'), second: id, matched: false});
+
+		return match.fetch();
+	});	
 
 	Handlebars.registerHelper('fbLink', function(id){
 		return 'https://www.facebook.com/' + id;
@@ -34,23 +42,24 @@ if( Meteor.isClient ){
 	}
 
 	Deps.autorun(function(){
-		if( !Meteor.user() ) return;
+		var user = Meteor.user();
+		if( user && !Session.get('bkp_friends') ){
+			Meteor.call('getUserData', function(err, result){
+				Session.set('userFbId', result.id);
 
-		Meteor.call('getUserData', function(err, result){
-			Session.set('userFbId', result.id);
+				if( !Meteor.user().fbId ){
+					Meteor.users.update( Meteor.user()._id, { $set: { fbId: result.id } } );
+				}				
+			});
 
-			// if( !Meteor.user().fbId ){
-			// 	Meteor.users.update( Meteor.user()._id, { $set: { fbId: result.id } } );
-			// }				
-		});
-
-		Meteor.call('getFriends', function(err, result){
-			if( err ) Session.set('friends', { error: err });
-			else {
-				Session.set('friends', result.data.slice(0,50));
-				Session.set('bkp_friends', result.data);
-			}
-		});		
+			Meteor.call('getFriends', function(err, result){
+				if( err ) Session.set('friends', { error: err });
+				else {
+					Session.set('friends', result.data.slice(0,50));
+					Session.set('bkp_friends', result.data);
+				}
+			});		
+		}
 	});
 
 	Template.love_select.friends = function(){
@@ -88,23 +97,17 @@ if( Meteor.isClient ){
 		'click .i-love': function( e ){
 			var secondID = this.id;
 
-			var isMatch = LoveMatches.findOne({ first: secondID, second: Session.get('userFbId') }); 
+			var isMatch = LoveMatches.findOne({ first: ''+secondID, second: Session.get('userFbId') }); 
 
 			if( isMatch ){
 				LoveMatches.update(isMatch._id, { $set: { matched: true } });
-
 				$( e.toElement ).text('É um encontro!')
 			} else {
 				LoveMatches.insert({
-					first: result.id,
-					second: secondID,
+					first: Session.get('userFbId'),
+					second: ''+secondID,
 					matched: false 
 				});
-
-				$( e.toElement )
-					.removeClass('i-love')
-					.addClass('i-unlove')
-					.text('Desfazer');
 			}
 		},
 
@@ -112,8 +115,7 @@ if( Meteor.isClient ){
 			var secondID = this.id,
 				unlove = LoveMatches.findOne({ 
 					second: secondID, 
-					first: Session.get('userFbId'), 
-					match: false 
+					matched: false 
 				});
 
 

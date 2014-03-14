@@ -34,7 +34,7 @@
 
 	{{#if currentUser}}
 	<div class='header jumbotron'>
-		<h1>LoveMeet <small>Encontre seu par</small></h1>
+		<h1>LoveMeet <small>Revele o amor</small></h1>
 		{{loginButtons}}
 	</div>
 	{{else}}
@@ -63,9 +63,20 @@
 		      <img src="{{getUserPhoto id}}" height='200' width= '200' class='img-responsive'>
 		      <div class="caption">
 		        <h3><a href="{{fbLink id}}" target="_blank">{{ shrinkName name }}</a></h3>
-		        <p>
-		        	<button type='button' class="btn btn-danger i-love">Estou afim</button> 
+
+		        {{#if checkLoveMatch id}}
+		        <p class='bg-danger'>
+		        	 É um encontro!
 		        </p>
+		        {{ else }}
+		        <p>
+		        	{{#if userHasLoved id}}
+		        		<button type='button' class="btn btn-danger i-unlove">Desfazer</button>
+		        	{{else}}
+		        		<button type='button' class="btn btn-danger i-love">Estou afim</button>
+		        	{{/if}} 
+		        </p>		        
+		        {{/if}}
 		      </div>
 		    </div>
 		  </div>

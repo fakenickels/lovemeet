@@ -1,7 +1,7 @@
 Meteor.publish('lovematches', function(){
-	var userId = this.userId, fbId = 0;
+	var userId = this.userId;
 
-	if( Meteor.user() ) fbId = Meteor.users.findOne( userId ).fbId;
+	if( userId ) fbId = Meteor.users.findOne( userId ).fbId;
 	
 	return LoveMatches.find({
 		$or: [{ first: fbId }, { second: fbId }]
