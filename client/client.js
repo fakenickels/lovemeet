@@ -1,4 +1,5 @@
 Meteor.subscribe('lovematches');
+Meteor.subscribe('fbIds');
 
 if( Meteor.isClient ){
 	Handlebars.registerHelper('getUserPhoto', function( id ){
@@ -6,13 +7,17 @@ if( Meteor.isClient ){
 	});
 
 	Handlebars.registerHelper('matchesCounter', function(){
-		
+		return LoveMatches.find({ matched: true }).fetch().length;
 	});
-	
-	Handlebars.registerHelper('checkLoveMatch', function(id){
-		var match = LoveMatches.find({ $or: [{first: id}, {matched: true}]});
 
-		return match.fetch();
+	Handlebars.registerHelper('notMatchedCounter', function(){
+		return LoveMatches.find({ matched: false }).fetch().length;
+	});
+
+	Handlebars.registerHelper('checkLoveMatch', function(loveId){
+		var match = LoveMatches.checkMatch( loveId );
+
+		return match;
 	});
 
 	Handlebars.registerHelper('userHasLoved', function(id){
@@ -47,8 +52,8 @@ if( Meteor.isClient ){
 			Meteor.call('getUserData', function(err, result){
 				Session.set('userFbId', result.id);
 
-				if( !Meteor.user().fbId ){
-					Meteor.users.update( Meteor.user()._id, { $set: { fbId: result.id } } );
+				if( !FacebookIds.findOne({fbId: result.id}) ){
+					FacebookIds.insert({ userId: Meteor.userId(), fbId: result.id });
 				}				
 			});
 
@@ -84,31 +89,36 @@ if( Meteor.isClient ){
 				var friends = Session.get('bkp_friends'),
 					search = $('#love-search').val().toLowerCase();
 
-				Session.set( 'friends', 
-					_.filter(friends, function(friend){
-						return friend.name.toLowerCase().indexOf(search) != -1;
-					})
-				);
-			}//
-
-			// Template.love_select({ friends: friends });
+				if( search != '' )
+					Session.set( 'friends', 
+						_.filter(friends, function(friend){
+							return friend.name.toLowerCase().indexOf(search) != -1;
+						})
+					);
+				else
+					Session.set('friends', Session.get('bkp_friends').slice(0,50));
+			}
 		},
 
 		'click .i-love': function( e ){
-			var secondID = this.id;
+			var secondID = this.id.toString();
 
-			var isMatch = LoveMatches.findOne({ first: ''+secondID, second: Session.get('userFbId') }); 
-
-			if( isMatch ){
-				LoveMatches.update(isMatch._id, { $set: { matched: true } });
-				$( e.toElement ).text('É um encontro!')
-			} else {
-				LoveMatches.insert({
+			var love = {
 					first: Session.get('userFbId'),
-					second: ''+secondID,
+					second: secondID, 
 					matched: false 
-				});
-			}
+				};
+
+			Meteor.call('verifyMatch', secondID, function(err, match){
+				if( err ){
+					console.log('Error at verifying match', err);
+					return false;
+				}
+
+				if( !match ){
+					LoveMatches.insert( love );
+				}
+			});
 		},
 
 		'click .i-unlove': function(){
@@ -145,6 +155,27 @@ if( Meteor.isClient ){
 				Session.set('friends', result);
 				Session.set('offset', offset-50);
 			});
-		}		
+		}	
+	});
+
+	Template.container.events({
+
+		'click #show-matched': function( e ){
+			e.preventDefault();
+			
+			var matchedIds = _.map( LoveMatches.findMatched(), function( love ){
+				var lovedId = love.first == Session.get('userFbId') ? love.second : love.first;
+
+				return lovedId; 
+			});
+
+			Session.set('friends', _.filter(Session.get('bkp_friends'), function( friend ){
+				return friend.id in matchedIds;
+			}));
+		},
+
+		'click #show-not-matched': function(){
+			
+		}			
 	})
 }

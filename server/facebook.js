@@ -47,5 +47,20 @@ Meteor.methods({
 			data = fb.getFriends( limit, offset );
 			
 		return data;
+	},
+
+	verifyMatch: function( friendFbId ){
+		var loverFbId = FacebookIds.getFbById( Meteor.userId() ),
+			match = LoveMatches.findOne({ first: friendFbId, second: loverFbId });
+			
+		if( match ){
+			LoveMatches.update(match._id, {
+				$set: {
+					matched: true
+				}
+			});
+		}
+
+		return match;	
 	}
 });
