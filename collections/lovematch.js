@@ -11,7 +11,7 @@ LoveMatches.checkMatch = function( loveId ){
 		]
 	});
 
-	return match;
+	return !!match;
 }
 
 LoveMatches.findMatched = function(){
