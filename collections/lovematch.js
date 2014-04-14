@@ -18,6 +18,33 @@ LoveMatches.findMatched = function(){
 	return LoveMatches.find({ matched: true }).fetch();
 }
 
+LoveMatches.getMatchedsFbId = function(){
+	var userFbId = LoveMatches.getFbId( Meteor.userId() ),
+		
+		matchedIds = _.map( LoveMatches.findMatched(), function( love ){
+			var lovedId = love.first == userFbId ? love.second : love.first;
+
+			return lovedId; 
+		});
+
+	return matchedIds;
+} 
+
+LoveMatches.findNotMatched = function(){
+	return LoveMatches.find({ matched: false }).fetch();
+}
+
+LoveMatches.getNotMatchedsFbId = function(){
+	var userFbId = LoveMatches.getFbId( Meteor.userId() ),
+		matchedIds = _.map( LoveMatches.findNotMatched(), function( love ){
+			var lovedId = love.first == userFbId ? love.second : love.first;
+
+			return lovedId; 
+		}); 
+
+	return matchedIds;
+}
+
 LoveMatches.allow({
 	insert: function(userID, lovematch){
 		return !!userID;
