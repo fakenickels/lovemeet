@@ -30,7 +30,11 @@ Handlebars.registerHelper('shrinkName', function( name ){
 	var splited = name.split(' ');
 
 	if( splited.length > 2 ){
-		return splited[ 0 ] + ' ' + splited[ 1 ];
+		if( !(/de|e/i).test( splited[1] ) ){
+			return splited[ 0 ] + ' ' + splited[ 1 ];
+		} else {
+			return splited[ 0 ] + ' ' + splited[ 2 ];
+		}
 	} else {
 		return name;
 	}

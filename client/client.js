@@ -12,22 +12,26 @@ Deps.autorun(function(){
 	if( user && !Session.get('bkp_friends') ){
 		NProgress.start();
 
-		Meteor.call('getUserData', function(err, result){
+		Meteor.call('getUserData', function(err, result){	
+			if(result === null ) return;
+
 			Session.set('userFbId', result.id);
 
 			if( !FacebookIds.findOne({fbId: result.id}) ){
 				FacebookIds.insert({ userId: Meteor.userId(), fbId: result.id });
-			}				
+			}	
+				
 		});
 
 		Meteor.call('getFriends', function(err, result){
+			if( result === null ) return;
+ 
 			if( err ) Session.set('friends', { error: err });
 			else {
 				Session.set('friends', result.data.slice(0,50));
 				Session.set('bkp_friends', result.data);
+				NProgress.done();
 			}
-
-			NProgress.done();
 		});		
 	}
 });
@@ -104,12 +108,15 @@ Template.love_select.events({
 
 	'click #friends-nav-right': function(){
 		var offset = Session.get('lastOffset');
-		if( !offset ) offset = 800;
-		offset = ~offset; 
+		if( !offset ) offset = 50;
+		offset = ~~offset; 
 
+		NProgress.start();
 		Meteor.call('getFriends', 50, offset, function(err, result){
 			Session.set('friends', result);
 			Session.set('offset', offset+50);
+			NProgress.done();
+			console.log(result)
 		});
 	},
 
@@ -117,7 +124,7 @@ Template.love_select.events({
 	'click #friends-nav-left': function(){
 		var offset = Session.get('lastOffset');
 		if( !offset ) offset = 799;
-		offset = ~offset; 
+		offset = ~~offset; 
 
 		Meteor.call('getFriends', 50, offset, function(err, result){
 			Session.set('friends', result);

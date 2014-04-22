@@ -36,7 +36,7 @@
 					<a href="#love_select" id ='love-select' data-toggle='tab' class='tab'>Escolher pessoas</a>
 				</li>
 				<li>
-					<a href="#show-not-matched" id='show-not-matched' data-toggle='tab' class='tab'>Não correspondidos <span class='badge'>{{notMatchedCounter}}</span></a>
+					<a href="javascript:void(0)" id='show-not-matched' data-toggle='tab' class='tab'>Não correspondidos <span class='badge'>{{notMatchedCounter}}</span></a>
 				</li>
 				<li>
 					<a href="#show-matched" id='show-matched' class='tab'>Correspondidos <span class='badge'>{{matchesCounter}}</span></a>
@@ -74,7 +74,7 @@
 			        {{ else }}
 			        <p>
 			        	{{#if userHasLoved id}}
-			        		<button type='button' class="btn btn-danger i-unlove">Desfazer</button>
+			        		<button type='button' class="btn btn-warning i-unlove">Desfazer</button>
 			        	{{else}}
 			        		<button type='button' class="btn btn-danger i-love">Estou afim</button>
 			        	{{/if}} 

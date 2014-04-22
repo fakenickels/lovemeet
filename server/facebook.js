@@ -35,6 +35,10 @@ Facebook.prototype.getFriends = function( limit, offset ){
 		return this.query('me/friends?limit=' + limit + '&offset=' + offset);
 }
 
+Facebook.prototype.getAllFriends = function(){
+	return this.query
+}
+
 Meteor.methods({
 	getUserData: function(){
 		var fb = new Facebook(Meteor.user().services.facebook.accessToken),
